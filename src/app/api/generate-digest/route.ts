@@ -2,11 +2,15 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 
-// 让 Node.js 原生 fetch 走系统代理（仅本地开发，Vercel 上不需要）
+// 本地开发时走系统代理（Vercel 上 undici 不存在，try-catch 保护）
 if (process.env.HTTPS_PROXY) {
-  // eslint-disable-next-line @typescript-eslint/no-require-imports
-  const { setGlobalDispatcher, ProxyAgent } = require("undici");
-  setGlobalDispatcher(new ProxyAgent(process.env.HTTPS_PROXY));
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const { setGlobalDispatcher, ProxyAgent } = require("undici");
+    setGlobalDispatcher(new ProxyAgent(process.env.HTTPS_PROXY));
+  } catch {
+    // undici 未安装（例如 Vercel 生产环境），忽略
+  }
 }
 
 const genAI = new GoogleGenerativeAI(process.env.OPENAI_API_KEY!);
