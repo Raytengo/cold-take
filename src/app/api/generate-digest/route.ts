@@ -1,10 +1,11 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { createClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
-import { setGlobalDispatcher, ProxyAgent } from "undici";
 
-// 让 Node.js 原生 fetch 走系统代理（本地开发需要）
+// 让 Node.js 原生 fetch 走系统代理（仅本地开发，Vercel 上不需要）
 if (process.env.HTTPS_PROXY) {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  const { setGlobalDispatcher, ProxyAgent } = require("undici");
   setGlobalDispatcher(new ProxyAgent(process.env.HTTPS_PROXY));
 }
 
